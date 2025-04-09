@@ -69,7 +69,6 @@ That's something we will cover in a dedicated lesson, so don't worry about it fo
 
 To create the GROQ_API_KEY, and be able to interact with Groq models, you just need to follow this [instructions](https://console.groq.com/docs/quickstart).
 
-![alt text](img/groq_api_key.png)
 
 Once you have created the API key, you can copy it and paste it into an `.env` file (following the same format as the `.env.example` file).
 
@@ -77,7 +76,6 @@ Once you have created the API key, you can copy it and paste it into an `.env` f
 
 To create the ELEVENLABS_API_KEY you need to create an account in [ElevenLabs](https://elevenlabs.io/). After that, go to your account settings and create the API key.
 
-![alt text](img/elevenlabs_api_key.png)
 
 As for the voice ID, you can check the available voices and select the one you prefer! We'll cover this in a dedicated lesson.
 
@@ -85,7 +83,6 @@ As for the voice ID, you can check the available voices and select the one you p
 
 Log in to [Together AI](https://www.together.ai/) and, inside your account settings, create the API key.
 
-![alt text](img/together_api_key.png)
 
 As we did with the previous API keys, copy the value and paste it into your own `.env` file.
 
@@ -95,11 +92,9 @@ This project uses Qdrant both locally (you don't need to do anything) and in the
 
 Once you are inside the Qdrant Cloud dashboard, create your API key here:
 
-![alt text](img/qdrant_api_key.png)
 
 You also need a QDRANT_URL, which is the URL of your Qdrant Cloud instance. You can find it here:
 
-![alt text](img/qdrant_url.png)
 
 Copy both values and paste them into your own `.env` file.
 
@@ -126,7 +121,6 @@ you can ignore it. Simply click the link to the Chainlit interface to start inte
 
 You should see something like this:
 
-![Ava Chainlit](img/ava_chainlit.png)
 
 Now that we have verified that everything is working, it's time to move on to the [Course Syllabus](../README.md) and start the first lesson!
 
