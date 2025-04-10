@@ -22,23 +22,19 @@ async def on_chat_start():
     cl.user_session.set("thread_id", 1)
 
 
+
 @cl.on_message
 async def on_message(message: cl.Message):
-    """Handle text messages and images"""
     msg = cl.Message(content="")
-
-    # Process any attached images
     content = message.content
+    thread_id = cl.user_session.get("thread_id")
+
     if message.elements:
         for elem in message.elements:
             if isinstance(elem, cl.Image):
-                # Read image file content
                 with open(elem.path, "rb") as f:
                     image_bytes = f.read()
-
-                # Analyze image and add to message content
                 try:
-                    # Use global ImageToText instance
                     description = await image_to_text.analyze_image(
                         image_bytes,
                         "Please describe what you see in this image in the context of our conversation.",
@@ -47,18 +43,21 @@ async def on_message(message: cl.Message):
                 except Exception as e:
                     cl.logger.warning(f"Failed to analyze image: {e}")
 
-    # Process through graph with enriched message content
-    thread_id = cl.user_session.get("thread_id")
-
     async with cl.Step(type="run"):
         async with AsyncSqliteSaver.from_conn_string(settings.SHORT_TERM_MEMORY_DB_PATH) as short_term_memory:
             graph = graph_builder.compile(checkpointer=short_term_memory)
+
+            # Store output from other nodes or capture final response from conversation_node
             async for chunk in graph.astream(
                 {"messages": [HumanMessage(content=content)]},
                 {"configurable": {"thread_id": thread_id}},
                 stream_mode="messages",
             ):
-                if chunk[1]["langgraph_node"] == "conversation_node" and isinstance(chunk[0], AIMessageChunk):
+                node_name = chunk[1].get("langgraph_node")
+                if isinstance(chunk[0], AIMessageChunk):
+                    if node_name == "conversation_node":
+                        # Don't stream internal Thought/Action messages
+                        continue
                     await msg.stream_token(chunk[0].content)
 
             output_state = await graph.aget_state(config={"configurable": {"thread_id": thread_id}})
@@ -78,8 +77,8 @@ async def on_message(message: cl.Message):
         image = cl.Image(path=output_state.values["image_path"], display="inline")
         await cl.Message(content=response, elements=[image]).send()
     else:
-        await msg.send()
-
+        final_response = output_state.values["messages"][-1].content
+        await cl.Message(content=final_response).send()
 
 @cl.on_audio_chunk
 async def on_audio_chunk(chunk: cl.AudioChunk):
